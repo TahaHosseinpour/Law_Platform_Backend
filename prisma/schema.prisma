@@ -1,0 +1,56 @@
+// Prisma Schema for Law Platform
+
+generator client {
+  provider             = "prisma-client-py"
+  interface            = "asyncio"
+  recursive_type_depth = 5
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User Role Enum
+enum UserRole {
+  USER
+  LAWYER
+  ADMIN
+}
+
+// User Model
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  fullName  String   @map("full_name")
+  role      UserRole @default(USER)
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  lawyerProfile LawyerProfile?
+
+  @@map("users")
+}
+
+// Lawyer Profile Model
+model LawyerProfile {
+  id               Int      @id @default(autoincrement())
+  userId           Int      @unique @map("user_id")
+  licenseNumber    String   @unique @map("license_number")
+  specialization   String
+  experienceYears  Int      @map("experience_years")
+  bio              String?
+  phoneNumber      String?  @map("phone_number")
+  address          String?
+  isVerified       Boolean  @default(false) @map("is_verified")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("lawyer_profiles")
+}
