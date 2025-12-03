@@ -1,6 +1,7 @@
 from pydantic import BaseModel, EmailStr
 from datetime import datetime
 from typing import Optional
+from decimal import Decimal
 from app.core.permissions import UserRole
 
 
@@ -21,6 +22,7 @@ class UserUpdate(BaseModel):
     email: Optional[EmailStr] = None
     fullName: Optional[str] = None
     password: Optional[str] = None
+    avatar: Optional[str] = None
 
 
 class UserResponse(UserBase):
@@ -28,6 +30,8 @@ class UserResponse(UserBase):
     id: int
     role: UserRole
     isActive: bool
+    credit: Decimal
+    avatar: Optional[str] = None
     createdAt: datetime
     updatedAt: datetime
 

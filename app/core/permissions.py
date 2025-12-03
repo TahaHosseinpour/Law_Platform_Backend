@@ -21,6 +21,13 @@ class Permission(str, Enum):
     UPDATE_LAWYER_PROFILE = "update_lawyer_profile"
     VIEW_LAWYER_PROFILES = "view_lawyer_profiles"
 
+    # Blog permissions
+    CREATE_BLOG_POST = "create_blog_post"
+    MANAGE_BLOG = "manage_blog"
+
+    # Transaction permissions
+    MANAGE_TRANSACTIONS = "manage_transactions"
+
     # Admin permissions
     MANAGE_USERS = "manage_users"
     MANAGE_LAWYERS = "manage_lawyers"
@@ -45,6 +52,8 @@ ROLE_PERMISSIONS: dict[UserRole, list[Permission]] = {
         Permission.VIEW_ALL_CASES,
         Permission.UPDATE_LAWYER_PROFILE,
         Permission.VIEW_LAWYER_PROFILES,
+        Permission.CREATE_BLOG_POST,
+        Permission.MANAGE_BLOG,
     ],
     UserRole.ADMIN: [
         # Admin has all permissions
@@ -55,6 +64,9 @@ ROLE_PERMISSIONS: dict[UserRole, list[Permission]] = {
         Permission.VIEW_ALL_CASES,
         Permission.UPDATE_LAWYER_PROFILE,
         Permission.VIEW_LAWYER_PROFILES,
+        Permission.CREATE_BLOG_POST,
+        Permission.MANAGE_BLOG,
+        Permission.MANAGE_TRANSACTIONS,
         Permission.MANAGE_USERS,
         Permission.MANAGE_LAWYERS,
         Permission.VIEW_ALL_DATA,

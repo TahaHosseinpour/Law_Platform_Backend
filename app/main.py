@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from app.config import settings
 from app.database import connect_db, disconnect_db
-from app.api import auth, users, lawyers, admin
+from app.api import auth, users, lawyers, admin, transactions, ai_chats, blog_categories, blog_posts
 
 
 @asynccontextmanager
@@ -37,6 +37,10 @@ app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(lawyers.router)
 app.include_router(admin.router)
+app.include_router(transactions.router)
+app.include_router(ai_chats.router)
+app.include_router(blog_categories.router)
+app.include_router(blog_posts.router)
 
 
 @app.get("/")

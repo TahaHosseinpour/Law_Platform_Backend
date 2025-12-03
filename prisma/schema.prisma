@@ -1,9 +1,10 @@
 // Prisma Schema for Law Platform
 
 generator client {
-  provider             = "prisma-client-py"
-  interface            = "asyncio"
-  recursive_type_depth = 5
+  provider                    = "prisma-client-py"
+  interface                   = "asyncio"
+  recursive_type_depth        = 5
+  enable_experimental_decimal = true
 }
 
 datasource db {
@@ -11,12 +12,34 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// User Role Enum
+// ============= ENUMS =============
+
 enum UserRole {
   USER
   LAWYER
   ADMIN
 }
+
+enum TransactionType {
+  DEPOSIT
+  WITHDRAW
+  PAYMENT
+  REFUND
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
+}
+
+// ============= MODELS =============
 
 // User Model
 model User {
@@ -26,31 +49,125 @@ model User {
   fullName  String   @map("full_name")
   role      UserRole @default(USER)
   isActive  Boolean  @default(true) @map("is_active")
+  credit    Decimal  @default(0) @db.Decimal(10, 2)
+  avatar    String?
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
   // Relations
   lawyerProfile LawyerProfile?
+  transactions  Transaction[]
+  aiChats       AIChat[]
+  blogPosts     BlogPost[]
 
   @@map("users")
 }
 
 // Lawyer Profile Model
 model LawyerProfile {
-  id               Int      @id @default(autoincrement())
-  userId           Int      @unique @map("user_id")
-  licenseNumber    String   @unique @map("license_number")
-  specialization   String
-  experienceYears  Int      @map("experience_years")
-  bio              String?
-  phoneNumber      String?  @map("phone_number")
-  address          String?
-  isVerified       Boolean  @default(false) @map("is_verified")
-  createdAt        DateTime @default(now()) @map("created_at")
-  updatedAt        DateTime @updatedAt @map("updated_at")
+  id              Int      @id @default(autoincrement())
+  userId          Int      @unique @map("user_id")
+  licenseNumber   String   @unique @map("license_number")
+  specialization  String
+  experienceYears Int      @map("experience_years")
+  bio             String?
+  phoneNumber     String?  @map("phone_number")
+  address         String?
+  profileImage    String?  @map("profile_image")
+  latitude        Decimal? @db.Decimal(10, 8)
+  longitude       Decimal? @db.Decimal(11, 8)
+  isVerified      Boolean  @default(false) @map("is_verified")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
 
   // Relations
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("lawyer_profiles")
+}
+
+// Transaction Model
+model Transaction {
+  id          Int               @id @default(autoincrement())
+  userId      Int               @map("user_id")
+  amount      Decimal           @db.Decimal(10, 2)
+  type        TransactionType
+  status      TransactionStatus @default(PENDING)
+  description String?
+  referenceId String?           @map("reference_id")
+  metadata    Json?
+  createdAt   DateTime          @default(now()) @map("created_at")
+  updatedAt   DateTime          @updatedAt @map("updated_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("transactions")
+}
+
+// AI Chat Model
+model AIChat {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  title     String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user     User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages AIChatMessage[]
+
+  @@map("ai_chats")
+}
+
+// AI Chat Message Model
+model AIChatMessage {
+  id        Int         @id @default(autoincrement())
+  chatId    Int         @map("chat_id")
+  role      MessageRole
+  content   String      @db.Text
+  createdAt DateTime    @default(now()) @map("created_at")
+
+  // Relations
+  chat AIChat @relation(fields: [chatId], references: [id], onDelete: Cascade)
+
+  @@map("ai_chat_messages")
+}
+
+// Blog Category Model
+model BlogCategory {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  posts BlogPost[]
+
+  @@map("blog_categories")
+}
+
+// Blog Post Model
+model BlogPost {
+  id             Int       @id @default(autoincrement())
+  categoryId     Int       @map("category_id")
+  authorId       Int       @map("author_id")
+  title          String
+  slug           String    @unique
+  content        String    @db.Text
+  excerpt        String?
+  featuredImage  String?   @map("featured_image")
+  isPublished    Boolean   @default(false) @map("is_published")
+  publishedAt    DateTime? @map("published_at")
+  viewCount      Int       @default(0) @map("view_count")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  category BlogCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  author   User         @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@map("blog_posts")
 }

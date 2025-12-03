@@ -34,6 +34,9 @@ async def create_lawyer_profile(
             "bio": profile_data.bio,
             "phoneNumber": profile_data.phoneNumber,
             "address": profile_data.address,
+            "profileImage": profile_data.profileImage,
+            "latitude": profile_data.latitude,
+            "longitude": profile_data.longitude,
         }
     )
 

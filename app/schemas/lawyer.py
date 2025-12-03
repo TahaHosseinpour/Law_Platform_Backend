@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from datetime import datetime
 from typing import Optional
+from decimal import Decimal
 
 
 class LawyerProfileBase(BaseModel):
@@ -11,6 +12,9 @@ class LawyerProfileBase(BaseModel):
     bio: Optional[str] = None
     phoneNumber: Optional[str] = None
     address: Optional[str] = None
+    profileImage: Optional[str] = None
+    latitude: Optional[Decimal] = None
+    longitude: Optional[Decimal] = None
 
 
 class LawyerProfileCreate(LawyerProfileBase):
@@ -26,6 +30,9 @@ class LawyerProfileUpdate(BaseModel):
     bio: Optional[str] = None
     phoneNumber: Optional[str] = None
     address: Optional[str] = None
+    profileImage: Optional[str] = None
+    latitude: Optional[Decimal] = None
+    longitude: Optional[Decimal] = None
 
 
 class LawyerProfileResponse(LawyerProfileBase):
