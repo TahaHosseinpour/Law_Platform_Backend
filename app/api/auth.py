@@ -32,7 +32,7 @@ async def register(
             "email": user_data.email,
             "password": hashed_password,
             "fullName": user_data.fullName,
-            "role": user_data.role,
+            "role": user_data.role.value if hasattr(user_data.role, 'value') else user_data.role,
         }
     )
 
@@ -70,6 +70,6 @@ async def login(
         )
 
     # Create access token
-    access_token = create_access_token(data={"sub": user.id})
+    access_token = create_access_token(data={"sub": str(user.id)})
 
     return Token(access_token=access_token)
