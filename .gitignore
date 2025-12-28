@@ -211,6 +211,9 @@ __marimo__/
 
 # Environment variables
 .env
+.env.local
+.env.production
+.env.*
 
 # Documentation
 README.md
